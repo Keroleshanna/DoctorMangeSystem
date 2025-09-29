@@ -1,0 +1,146 @@
+﻿@using DoctorMange.ViewModels
+@model AppointmentFormVM
+
+<form class="container" id="appointmentForm" asp-action="Create" method="post">
+	<h1 class="mb-4">Complete Appointment with @Model.DoctorName</h1>
+	@Html.AntiForgeryToken() <!-- بيولد توكن-->
+	<!-- Hidden Fields for Doctor Info -->
+	<input type="hidden" name="DoctorId" value="@Model.DoctorId" />
+	@* <input type="hidden" name="DoctorName" value="@Model.DoctorName" /> *@
+
+	<div class="row">
+		<!-- Patient Information -->
+		<div class="col-md-6">
+			<div class="form-group">
+				<label for="phoneNumber" class="form-label">Patient Name *</label>
+				<input type="tel" class="form-control" id="phoneNumber" name="PatientName"
+					   placeholder="Please Enter Your Name" value="@Model?.PatientName" required>
+				<div class="invalid-feedback">Please enter a valid phone number</div>
+			</div>
+		</div>
+
+
+		<div class="col-md-6">
+			<div class="form-group">
+				<label for="phoneNumber" class="form-label">Phone Number *</label>
+				<input type="tel" class="form-control" id="phoneNumber" name="Phone"
+					   placeholder="010XXXXXXXX" value="@Model?.Phone" required>
+				<div class="invalid-feedback">Please enter a valid phone number</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-6">
+			<div class="form-group">
+				<label for="email" class="form-label">Email Address *</label>
+				<input type="email" class="form-control" id="email" name="Email"
+					   placeholder="your@email.com" value="@Model?.Email" required>
+				<div class="invalid-feedback">Please enter a valid email address</div>
+			</div>
+		</div>
+
+		<div class="col-md-6">
+			<div class="form-group">
+				<label for="patientAge" class="form-label">Age</label>
+				<input type="number" class="form-control" id="patientAge" name="Age"
+					   placeholder="Your age" value="@Model?.Age" min="1" max="120">
+			</div>
+		</div>
+	</div>
+
+	<!-- Appointment DateTime -->
+	<div class="row">
+		<div class="col-md-6">
+			<div class="form-group">
+				<label for="appointmentDate" class="form-label">Appointment Date *</label>
+				<input type="date" class="form-control" id="appointmentDate" name="BookingDate"
+					   value="@Model?.BookingDate.ToString("yyyy-MM-dd")"
+					   min="@DateTime.Now.ToString("yyyy-MM-dd")" required>
+				<div class="invalid-feedback">Please select a future date</div>
+			</div>
+		</div>
+
+		<div class="col-md-6">
+			<div class="form-group">
+				<label for="appointmentTime" class="form-label">Appointment Time *</label>
+				<select class="form-control" id="appointmentTime" name="BookingTime" required>
+					<option value="">-- Select Time --</option>
+					<option value="08:00">08:00 AM</option>
+					<option value="08:30">08:30 AM</option>
+					<option value="09:00">09:00 AM</option>
+					<option value="09:30">09:30 AM</option>
+					<option value="10:00">10:00 AM</option>
+					<option value="10:30">10:30 AM</option>
+					<option value="11:00">11:00 AM</option>
+					<option value="11:30">11:30 AM</option>
+					<option value="12:00">12:00 PM</option>
+					<option value="12:30">12:30 PM</option>
+					<option value="13:00">01:00 PM</option>
+					<option value="13:30">01:30 PM</option>
+					<option value="14:00">02:00 PM</option>
+					<option value="14:30">02:30 PM</option>
+					<option value="15:00">03:00 PM</option>
+					<option value="15:30">03:30 PM</option>
+					<option value="16:00">04:00 PM</option>
+					<option value="16:30">04:30 PM</option>
+					<option value="17:00">05:00 PM</option>
+
+				</select>
+				<div class="invalid-feedback">Please select appointment time</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Medical Information -->
+	<div class="form-group">
+		<label for="symptoms" class="form-label">Symptoms / Medical Notes</label>
+		<textarea class="form-control" id="symptoms" name="Notes" rows="4" required
+				  placeholder="Describe your symptoms or any important medical information...">@Model?.Notes</textarea >
+		<div class="invalid-feedback">You must agree to the terms</div>
+	</div>
+
+	<!-- Terms Agreement -->
+	<div class="form-group form-check">
+		<input type="checkbox" class="form-check-input" id="termsAgreement" name="TermsAgreement" required>
+		<label class="form-check-label" for="termsAgreement">
+			I agree to the <a href="/Home/Terms" target="_blank">terms and conditions</a> *
+		</label>
+		<div class="invalid-feedback">You must agree to the terms</div>
+	</div>
+
+	<br />
+
+	<!-- Action Buttons -->
+	<div class="d-flex gap-3">
+		<button type="submit" class="btn btn-success btn-lg" id="submitBtn">
+			<i class="fas fa-calendar-check"></i> Confirm Appointment
+		</button>
+
+		<a href="/Home/Doctors" class="btn btn-outline-secondary btn-lg">
+			<i class="fas fa-arrow-left"></i> Back to Doctors
+		</a>
+	</div>
+</form>
+@section Scripts {
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script>
+		// منع اختيار الجمعة والسبت
+		document.getElementById("appointmentDate").addEventListener("change", function () {
+			let selectedDate = new Date(this.value);
+			let day = selectedDate.getDay(); // 0=Sunday, 5=Friday, 6=Saturday
+
+			if (day === 5 || day === 6) {
+				Swal.fire({
+					icon: 'error',
+					title: 'غير متاح',
+					text: 'لا يمكن حجز موعد في يوم الجمعة أو السبت.',
+					confirmButtonText: 'حسناً'
+				});
+				this.value = ""; // يمسح التاريخ
+			}
+		});
+
+	</script>
+}
+
